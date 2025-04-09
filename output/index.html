@@ -50,11 +50,11 @@
   <div id="results">Loading...</div>
 
   <script>
-    fetch('./output/report.json')
+    fetch('report.json')
       .then(res => res.json())
       .then(data => {
         const container = document.getElementById('results');
-        container.innerHTML = '';  // Clear loading text
+        container.innerHTML = '';
 
         for (const [header, info] of Object.entries(data)) {
           const div = document.createElement('div');
