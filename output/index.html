@@ -3,73 +3,178 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Security Headers Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Report</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f9fafb;
-      padding: 2rem;
-      color: #111;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
     }
 
-    h1 {
-      color: #111827;
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      text-align: center;
     }
 
-    .header {
-      margin: 1rem 0;
-      padding: 1rem;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
-    .header h2 {
-      margin-bottom: 0.5rem;
-      color: #1f2937;
+    h2 {
+      color: #4CAF50;
     }
 
-    .header p {
-      margin: 0.2rem 0;
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section h3 {
+      color: #333;
+    }
+
+    .section p {
+      margin: 5px 0;
     }
 
     .status {
       font-weight: bold;
-      color: green;
+      padding: 5px;
+      color: white;
     }
 
-    .status.missing {
-      color: red;
+    .status.defined {
+      background-color: #4CAF50;
+    }
+
+    .status.undef {
+      background-color: #FF9800;
+    }
+
+    .status.warn {
+      background-color: #FF5722;
+    }
+
+    .notes {
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .table th {
+      background-color: #f2f2f2;
     }
   </style>
 </head>
 
 <body>
-  <h1>🔐 Security Headers Report</h1>
-  <div id="results">Loading...</div>
+  <header>
+    <h1>Security Report - <span id="target-url">https://esim.holafly.com</span></h1>
+  </header>
+
+  <div class="container">
+    <section class="section">
+      <h2>Security Headers</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Status</th>
+            <th>Contents</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>x-frame-options</td>
+            <td><span class="status defined">Defined</span></td>
+            <td>SAMEORIGIN</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>strict-transport-security</td>
+            <td><span class="status warn">Not defined</span></td>
+            <td>N/A</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>content-security-policy</td>
+            <td><span class="status warn">Not defined</span></td>
+            <td>N/A</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>x-content-type-options</td>
+            <td><span class="status warn">Not defined</span></td>
+            <td>N/A</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>x-xss-protection</td>
+            <td><span class="status undef">Not defined</span></td>
+            <td>N/A</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>referrer-policy</td>
+            <td><span class="status warn">Not defined</span></td>
+            <td>N/A</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>permissions-policy</td>
+            <td><span class="status warn">Not defined</span></td>
+            <td>N/A</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>server</td>
+            <td><span class="status defined">Defined</span></td>
+            <td>nginx</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>HTTPS</h2>
+      <p><strong>Supported:</strong> <span id="https-supported" class="status defined">Yes</span></p>
+      <p><strong>Certificate valid:</strong> <span id="https-certvalid" class="status defined">Yes</span></p>
+      <p><strong>Redirect:</strong> <span id="https-redirect" class="status defined">Yes</span></p>
+    </section>
+  </div>
 
   <script>
     fetch('report.json')
       .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('results');
-        container.innerHTML = '';
+      .then(report => {
+        // Update the target URL in the header
+        document.getElementById("target-url").textContent = report.target;
 
-        for (const [header, info] of Object.entries(data)) {
-          const div = document.createElement('div');
-          div.className = 'header';
-
-          const statusClass = info.present ? 'status' : 'status missing';
-          div.innerHTML = `
-            <h2>${header}</h2>
-            <p><span class="${statusClass}">${info.present ? '✅ Present' : '❌ Missing'}</span></p>
-            <p><strong>Recommendation:</strong> ${info.recommendation || 'N/A'}</p>
-            <p><strong>Description:</strong> ${info.description || 'N/A'}</p>
-          `;
-
-          container.appendChild(div);
-        }
+        // HTTPS
+        document.getElementById("https-supported").classList.add(report.https.supported ? 'defined' : 'warn');
+        document.getElementById("https-certvalid").classList.add(report.https.certvalid ? 'defined' : 'warn');
+        document.getElementById("https-redirect").classList.add(report.https.redirect ? 'defined' : 'warn');
       })
       .catch(err => {
         document.getElementById('results').innerText = 'Error loading report.json';
