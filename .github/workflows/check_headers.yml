@@ -16,7 +16,12 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: Install Dependencies
+        run: |
+          pip install secheaders
+
       - name: Scan Security Headers
         run: |
           mkdir -p output
           secheaders https://esim.holafly.com --json > output/report.json
+
