@@ -25,3 +25,8 @@ jobs:
           mkdir -p output
           secheaders https://esim.holafly.com --json > output/report.json
 
+      - name: Print JSON Output
+        run: |
+          echo "Printing the JSON result:"
+          cat output/report.json  # Display the content
+
