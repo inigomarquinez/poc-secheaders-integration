@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security Headers Report</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9fafb;
+      padding: 2rem;
+      color: #111;
+    }
+
+    h1 {
+      color: #111827;
+    }
+
+    .header {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .header h2 {
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+    }
+
+    .header p {
+      margin: 0.2rem 0;
+    }
+
+    .status {
+      font-weight: bold;
+      color: green;
+    }
+
+    .status.missing {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🔐 Security Headers Report</h1>
+  <div id="results">Loading...</div>
+
+  <script>
+    fetch('./output/report.json')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('results');
+        container.innerHTML = '';  // Clear loading text
+
+        for (const [header, info] of Object.entries(data)) {
+          const div = document.createElement('div');
+          div.className = 'header';
+
+          const statusClass = info.present ? 'status' : 'status missing';
+          div.innerHTML = `
+            <h2>${header}</h2>
+            <p><span class="${statusClass}">${info.present ? '✅ Present' : '❌ Missing'}</span></p>
+            <p><strong>Recommendation:</strong> ${info.recommendation || 'N/A'}</p>
+            <p><strong>Description:</strong> ${info.description || 'N/A'}</p>
+          `;
+
+          container.appendChild(div);
+        }
+      })
+      .catch(err => {
+        document.getElementById('results').innerText = 'Error loading report.json';
+        console.error(err);
+      });
+  </script>
+</body>
+
+</html>
